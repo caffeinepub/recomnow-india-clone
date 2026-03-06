@@ -1,14 +1,19 @@
 import { useState } from "react";
 import type { Product } from "../backend.d";
 
+// Backend stores prices in paise (1 rupee = 100 paise), so divide by 100 for display
+function paiseToRupees(paise: bigint | number): number {
+  const numericValue = typeof paise === "bigint" ? Number(paise) : paise;
+  return numericValue / 100;
+}
+
 function formatINR(price: bigint | number): string {
-  const numericValue = typeof price === "bigint" ? Number(price) : price;
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(numericValue);
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(paiseToRupees(price));
 }
 
 function getCategoryLabel(product: Product): string {

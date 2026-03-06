@@ -228,10 +228,16 @@ function LoginScreen({ actor, onSuccess, navigate }: LoginScreenProps) {
     setError("");
     try {
       const result = await actor.adminLogin(username.trim(), password);
-      if (result === null || result === undefined || result === "") {
+      // ICP optionals return as array: [value] for Some, [] for None
+      const token = Array.isArray(result)
+        ? result.length > 0
+          ? result[0]
+          : null
+        : result;
+      if (!token) {
         setError("Invalid username or password. Please try again.");
       } else {
-        onSuccess(result as string);
+        onSuccess(token as string);
         toast.success("Welcome back, Admin!");
       }
     } catch {
@@ -608,10 +614,16 @@ function Dashboard({ actor, token, onLogout, navigate }: DashboardProps) {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right text-admin-text text-sm font-semibold">
-                        ₹{Number(product.price).toLocaleString("en-IN")}
+                        ₹
+                        {Math.round(Number(product.price) / 100).toLocaleString(
+                          "en-IN",
+                        )}
                       </TableCell>
                       <TableCell className="text-right text-admin-muted text-sm hidden sm:table-cell">
-                        ₹{Number(product.mrp).toLocaleString("en-IN")}
+                        ₹
+                        {Math.round(Number(product.mrp) / 100).toLocaleString(
+                          "en-IN",
+                        )}
                       </TableCell>
                       <TableCell className="text-right hidden lg:table-cell">
                         <span className="text-green-400 text-sm font-medium">
@@ -764,13 +776,14 @@ function ProductFormDialog({
   useEffect(() => {
     if (open) {
       if (editProduct) {
+        // Backend stores price/MRP in paise; divide by 100 to show rupees in the form
         setForm({
           title: editProduct.title,
           description: editProduct.description,
           imageUrl: editProduct.imageUrl,
           affiliateLink: editProduct.affiliateLink,
-          price: String(Number(editProduct.price)),
-          mrp: String(Number(editProduct.mrp)),
+          price: String(Math.round(Number(editProduct.price) / 100)),
+          mrp: String(Math.round(Number(editProduct.mrp) / 100)),
           discountPercentage: String(Number(editProduct.discountPercentage)),
           categoryKey: getCategoryKey(editProduct.category),
           isFeatured: editProduct.isFeatured,
@@ -820,8 +833,9 @@ function ProductFormDialog({
     setSaving(true);
     try {
       const category = buildCategory(form.categoryKey);
-      const price = BigInt(Math.round(Number(form.price)));
-      const mrp = BigInt(Math.round(Number(form.mrp)));
+      // Backend stores prices in paise; multiply rupees by 100 before saving
+      const price = BigInt(Math.round(Number(form.price) * 100));
+      const mrp = BigInt(Math.round(Number(form.mrp) * 100));
       const disc = BigInt(Math.round(Number(form.discountPercentage)));
 
       if (editProduct) {
@@ -869,7 +883,7 @@ function ProductFormDialog({
         className="admin-dialog border-admin-border max-w-2xl max-h-[90vh] overflow-y-auto"
       >
         <DialogHeader>
-          <DialogTitle className="text-admin-text text-lg font-bold">
+          <DialogTitle className="text-blue-800 text-lg font-bold">
             {editProduct ? "Edit Product" : "Add New Product"}
           </DialogTitle>
         </DialogHeader>
@@ -1007,10 +1021,10 @@ function ProductFormDialog({
           {/* Featured toggle */}
           <div className="flex items-center justify-between rounded-lg border border-admin-border px-4 py-3">
             <div>
-              <p className="text-sm font-medium text-admin-text">
+              <p className="text-sm font-semibold text-blue-800">
                 Featured Product
               </p>
-              <p className="text-xs text-admin-muted">
+              <p className="text-xs text-blue-700">
                 Show on home page highlights
               </p>
             </div>
@@ -1071,9 +1085,9 @@ interface FormFieldProps {
 function FormField({ label, error, required, children }: FormFieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label className="text-admin-text text-sm font-medium">
+      <Label className="text-blue-800 text-sm font-semibold">
         {label}
-        {required && <span className="text-red-400 ml-0.5">*</span>}
+        {required && <span className="text-amber-400 ml-0.5">*</span>}
       </Label>
       {children}
       {error && <p className="text-xs text-red-400">{error}</p>}

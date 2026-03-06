@@ -119,12 +119,12 @@
     background-color: oklch(var(--admin-surface) / 0.6);
   }
   .admin-input {
-    background-color: oklch(var(--admin-surface));
-    border-color: oklch(var(--admin-border));
-    color: oklch(var(--admin-text));
+    background-color: oklch(0.20 0.04 255);
+    border-color: oklch(0.35 0.06 255);
+    color: oklch(0.95 0.01 250);
   }
   .admin-input::placeholder {
-    color: oklch(var(--admin-muted));
+    color: oklch(0.65 0.04 255);
   }
   .admin-input:focus {
     border-color: oklch(var(--admin-accent));
