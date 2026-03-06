@@ -491,7 +491,7 @@ function Dashboard({ actor, token, onLogout, navigate }: DashboardProps) {
           <Button
             onClick={handleAddClick}
             data-ocid="admin.add_product.button"
-            className="admin-btn-primary gap-2 w-full sm:w-auto"
+            className="admin-btn-primary gap-2 w-full sm:w-auto text-white font-bold"
           >
             <Plus className="h-4 w-4" />
             Add New Product
@@ -608,10 +608,10 @@ function Dashboard({ actor, token, onLogout, navigate }: DashboardProps) {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right text-admin-text text-sm font-semibold">
-                        ₹{(Number(product.price) / 100).toLocaleString("en-IN")}
+                        ₹{Number(product.price).toLocaleString("en-IN")}
                       </TableCell>
                       <TableCell className="text-right text-admin-muted text-sm hidden sm:table-cell">
-                        ₹{(Number(product.mrp) / 100).toLocaleString("en-IN")}
+                        ₹{Number(product.mrp).toLocaleString("en-IN")}
                       </TableCell>
                       <TableCell className="text-right hidden lg:table-cell">
                         <span className="text-green-400 text-sm font-medium">
@@ -632,7 +632,7 @@ function Dashboard({ actor, token, onLogout, navigate }: DashboardProps) {
                             variant="ghost"
                             onClick={() => handleEditClick(product)}
                             data-ocid={`admin.product.edit_button.${idx + 1}`}
-                            className="h-8 w-8 text-admin-muted hover:text-gold-500 hover:bg-gold-500/10"
+                            className="h-8 w-8 text-blue-400 hover:text-blue-300 hover:bg-blue-400/10"
                             aria-label={`Edit ${product.title}`}
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -642,7 +642,7 @@ function Dashboard({ actor, token, onLogout, navigate }: DashboardProps) {
                             variant="ghost"
                             onClick={() => handleDeleteClick(product)}
                             data-ocid={`admin.product.delete_button.${idx + 1}`}
-                            className="h-8 w-8 text-admin-muted hover:text-red-400 hover:bg-red-400/10"
+                            className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-400/10"
                             aria-label={`Delete ${product.title}`}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -769,8 +769,8 @@ function ProductFormDialog({
           description: editProduct.description,
           imageUrl: editProduct.imageUrl,
           affiliateLink: editProduct.affiliateLink,
-          price: String(Number(editProduct.price) / 100),
-          mrp: String(Number(editProduct.mrp) / 100),
+          price: String(Number(editProduct.price)),
+          mrp: String(Number(editProduct.mrp)),
           discountPercentage: String(Number(editProduct.discountPercentage)),
           categoryKey: getCategoryKey(editProduct.category),
           isFeatured: editProduct.isFeatured,
@@ -820,8 +820,8 @@ function ProductFormDialog({
     setSaving(true);
     try {
       const category = buildCategory(form.categoryKey);
-      const price = BigInt(Math.round(Number(form.price) * 100));
-      const mrp = BigInt(Math.round(Number(form.mrp) * 100));
+      const price = BigInt(Math.round(Number(form.price)));
+      const mrp = BigInt(Math.round(Number(form.mrp)));
       const disc = BigInt(Math.round(Number(form.discountPercentage)));
 
       if (editProduct) {
