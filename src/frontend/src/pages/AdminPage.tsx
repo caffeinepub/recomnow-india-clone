@@ -149,13 +149,22 @@ export default function AdminPage({ navigate }: AdminPageProps) {
       setAuthLoading(false);
       return;
     }
+    // Give the canister up to 5s to validate; if it fails, just show login screen
+    const timeout = setTimeout(() => {
+      localStorage.removeItem("adminToken");
+      setAuthLoading(false);
+    }, 5000);
     actor
       .validateAdminToken(stored)
       .then((valid) => {
+        clearTimeout(timeout);
         if (valid) setToken(stored);
         else localStorage.removeItem("adminToken");
       })
-      .catch(() => localStorage.removeItem("adminToken"))
+      .catch(() => {
+        clearTimeout(timeout);
+        localStorage.removeItem("adminToken");
+      })
       .finally(() => setAuthLoading(false));
   }, [actor, isFetching]);
 
@@ -221,13 +230,27 @@ function LoginScreen({ actor, onSuccess, navigate }: LoginScreenProps) {
       return;
     }
     if (!actor) {
-      setError("Connection not ready. Please wait and try again.");
+      setError("Connection not ready. Please refresh the page and try again.");
       return;
     }
     setLoading(true);
     setError("");
     try {
-      const result = await actor.adminLogin(username.trim(), password);
+      // Retry up to 3 times in case of transient network issues
+      let result: string | [] | [string] | null = null;
+      let lastError: unknown = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          result = await actor.adminLogin(username.trim(), password);
+          lastError = null;
+          break;
+        } catch (err) {
+          lastError = err;
+          if (attempt < 2) await new Promise((r) => setTimeout(r, 1000));
+        }
+      }
+      if (lastError) throw lastError;
+
       // ICP optionals return as array: [value] for Some, [] for None
       const token = Array.isArray(result)
         ? result.length > 0
@@ -240,8 +263,9 @@ function LoginScreen({ actor, onSuccess, navigate }: LoginScreenProps) {
         onSuccess(token as string);
         toast.success("Welcome back, Admin!");
       }
-    } catch {
-      setError("Login failed. Please check your connection and try again.");
+    } catch (err) {
+      console.error("Admin login error:", err);
+      setError("Login failed. Please refresh the page and try again.");
     } finally {
       setLoading(false);
     }
@@ -880,7 +904,7 @@ function ProductFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         data-ocid="product.form_dialog"
-        className="admin-dialog border-admin-border max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-white border border-blue-200 max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto"
       >
         <DialogHeader>
           <DialogTitle className="text-blue-800 text-lg font-bold">
@@ -897,7 +921,7 @@ function ProductFormDialog({
               placeholder="e.g. Banarasi Silk Saree"
               disabled={saving}
               data-ocid="product.title_input"
-              className="admin-input"
+              className="form-input"
             />
           </FormField>
 
@@ -910,7 +934,7 @@ function ProductFormDialog({
               rows={3}
               disabled={saving}
               data-ocid="product.description_input"
-              className="admin-input resize-none"
+              className="form-input resize-none"
             />
           </FormField>
 
@@ -922,7 +946,7 @@ function ProductFormDialog({
               placeholder="https://…"
               disabled={saving}
               data-ocid="product.image_url_input"
-              className="admin-input"
+              className="form-input"
             />
           </FormField>
 
@@ -938,12 +962,12 @@ function ProductFormDialog({
               placeholder="https://amzn.to/…"
               disabled={saving}
               data-ocid="product.affiliate_link_input"
-              className="admin-input"
+              className="form-input"
             />
           </FormField>
 
-          {/* Price / MRP / Discount row */}
-          <div className="grid grid-cols-3 gap-4">
+          {/* Price / MRP / Discount row — stacks on mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <FormField label="Price (₹)" error={errors.price} required>
               <Input
                 value={form.price}
@@ -954,7 +978,7 @@ function ProductFormDialog({
                 step="0.01"
                 disabled={saving}
                 data-ocid="product.price_input"
-                className="admin-input"
+                className="form-input"
               />
             </FormField>
             <FormField label="MRP (₹)" error={errors.mrp} required>
@@ -967,7 +991,7 @@ function ProductFormDialog({
                 step="0.01"
                 disabled={saving}
                 data-ocid="product.mrp_input"
-                className="admin-input"
+                className="form-input"
               />
             </FormField>
             <FormField
@@ -984,7 +1008,7 @@ function ProductFormDialog({
                 max="100"
                 disabled={saving}
                 data-ocid="product.discount_input"
-                className="admin-input"
+                className="form-input"
               />
             </FormField>
           </div>
@@ -1000,16 +1024,16 @@ function ProductFormDialog({
             >
               <SelectTrigger
                 data-ocid="product.category_select"
-                className="admin-input w-full"
+                className="form-input w-full"
               >
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent className="admin-dialog border-admin-border">
+              <SelectContent className="bg-white border border-blue-200 text-blue-800">
                 {CATEGORY_OPTIONS.map((opt) => (
                   <SelectItem
                     key={opt.value}
                     value={opt.value}
-                    className="text-admin-text focus:bg-gold-500/10 focus:text-admin-text"
+                    className="text-blue-800 focus:bg-blue-50 focus:text-blue-900"
                   >
                     {opt.label}
                   </SelectItem>
@@ -1019,7 +1043,7 @@ function ProductFormDialog({
           </FormField>
 
           {/* Featured toggle */}
-          <div className="flex items-center justify-between rounded-lg border border-admin-border px-4 py-3">
+          <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50/50 px-4 py-3">
             <div>
               <p className="text-sm font-semibold text-blue-800">
                 Featured Product
@@ -1045,7 +1069,7 @@ function ProductFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={saving}
               data-ocid="product.cancel_button"
-              className="text-admin-muted hover:text-admin-text"
+              className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
             >
               Cancel
             </Button>
@@ -1085,12 +1109,12 @@ interface FormFieldProps {
 function FormField({ label, error, required, children }: FormFieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label className="text-blue-800 text-sm font-semibold">
+      <Label className="text-blue-700 text-sm font-semibold">
         {label}
-        {required && <span className="text-amber-400 ml-0.5">*</span>}
+        {required && <span className="text-amber-500 ml-0.5">*</span>}
       </Label>
       {children}
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

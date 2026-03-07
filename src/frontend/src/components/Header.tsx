@@ -38,7 +38,7 @@ export default function Header({ currentPath, navigate }: HeaderProps) {
               width={36}
               height={36}
             />
-            <span className="text-xl font-bold text-foreground">
+            <span className="text-lg sm:text-xl font-bold text-foreground truncate max-w-[160px] sm:max-w-none">
               RecomNow India
             </span>
           </button>

@@ -144,6 +144,22 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  /* ── Product Form Dialog inputs (light background, deep blue text) ── */
+  .form-input {
+    background-color: white;
+    border-color: oklch(0.75 0.08 250);
+    color: oklch(0.20 0.10 250);
+  }
+  .form-input::placeholder {
+    color: oklch(0.60 0.06 250);
+  }
+  .form-input:focus {
+    border-color: oklch(0.45 0.18 250);
+    outline: none;
+    box-shadow: 0 0 0 2px oklch(0.45 0.18 250 / 0.2);
+  }
+
   .text-admin-text {
     color: oklch(var(--admin-text));
   }
