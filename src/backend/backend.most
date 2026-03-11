@@ -1,0 +1,52 @@
+// Version: 1.0.0
+type Category__164941945 =
+  {
+    #fashion : FashionCategory__522182519;
+    #jewellery : JewelleryCategory__453369936
+  };
+type Data__236546928<K, V> =
+  {var count : Nat__1049140820; kvs : [var ?(K, V)]};
+type FashionCategory__522182519 =
+  {
+    #festive;
+    #gowns;
+    #kurtaKurtis;
+    #lehengaCholis;
+    #salwarSuits;
+    #sarees;
+    #sportsWear;
+    #westernWear
+  };
+type Internal__554968229<K, V> =
+  {children : [var ?Node__733231314<K, V>]; data : Data__236546928<K, V>};
+type JewelleryCategory__453369936 = {#necklaces; #rings};
+type Leaf__405777811<K, V> = {data : Data__236546928<K, V>};
+type Nat__1049140820 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__733231314<K, V> =
+  {#internal : Internal__554968229<K, V>; #leaf : Leaf__405777811<K, V>};
+type Product__853085059 =
+  {
+    affiliateLink : Text;
+    category : Category__164941945;
+    description : Text;
+    discountPercentage : Nat;
+    id : Nat;
+    imageUrl : Text;
+    isFeatured : Bool;
+    mrp : Nat;
+    price : Nat;
+    title : Text
+  };
+actor {
+  stable var admin : {password : Text; username : Text};
+  stable var adminToken : Text;
+  stable defaultAdmin : {password : Text; username : Text};
+  stable var nextId : Nat;
+  stable products :
+    {
+      var root : Node__733231314<Nat, Product__853085059>;
+      var size : Nat__1049140820
+    };
+  stable seedProducts : [Product__853085059]
+};

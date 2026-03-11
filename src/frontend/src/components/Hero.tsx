@@ -1,4 +1,7 @@
 import heroBannerImg from "../../public/assets/generated/hero-products.dim_1600x700.webp";
+import amazonBadge from "../../public/assets/uploads/IMG_20260311_184747-2.jpg";
+import certifiedSellerBadge from "../../public/assets/uploads/IMG_20260311_184808-1.jpg";
+import securePaymentBadge from "../../public/assets/uploads/IMG_20260311_184837-3.jpg";
 
 interface HeroProps {
   navigate: (path: string) => void;
@@ -40,7 +43,7 @@ export default function Hero({ navigate }: HeroProps) {
             Discover handpicked collections of sarees, kurtis, jewellery and
             more — all at unbeatable prices.
           </p>
-          <div className="flex flex-wrap justify-center sm:justify-start gap-3 sm:gap-4">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-3 sm:gap-4 mb-8">
             <button
               type="button"
               onClick={() => navigate("/products")}
@@ -57,6 +60,24 @@ export default function Hero({ navigate }: HeroProps) {
             >
               View Collections
             </button>
+          </div>
+          {/* Trust Badges */}
+          <div className="flex flex-wrap justify-center sm:justify-start gap-3 sm:gap-4">
+            <img
+              src={certifiedSellerBadge}
+              alt="Certified Seller"
+              className="h-10 sm:h-12 w-auto object-contain rounded-lg"
+            />
+            <img
+              src={amazonBadge}
+              alt="Available on Amazon"
+              className="h-10 sm:h-12 w-auto object-contain rounded-lg"
+            />
+            <img
+              src={securePaymentBadge}
+              alt="Secure Payment"
+              className="h-10 sm:h-12 w-auto object-contain rounded-lg"
+            />
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import logoImg from "../../public/assets/uploads/IMG_20251201_202915-1-1.jpg";
+import logoImg from "../../public/assets/generated/recomnow-logo-upload.dim_200x200.webp";
 
 interface HeaderProps {
   currentPath: string;

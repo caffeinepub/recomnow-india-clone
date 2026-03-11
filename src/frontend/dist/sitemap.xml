@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Home Page -->
+  <url>
+    <loc>https://recomnowindia-2gi.caffeine.xyz/</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://recomnowindia-2gi.caffeine.xyz/assets/generated/hero-products.dim_1600x700.webp</image:loc>
+      <image:title>RecomNow India - Fashion and Jewellery Hero Banner</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://recomnowindia-2gi.caffeine.xyz/assets/generated/recomnow-logo.dim_200x200.webp</image:loc>
+      <image:title>RecomNow India Logo</image:title>
+    </image:image>
+  </url>
+
+  <!-- Products Page -->
+  <url>
+    <loc>https://recomnowindia-2gi.caffeine.xyz/products</loc>
+    <lastmod>2026-03-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+</urlset>
