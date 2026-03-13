@@ -1,7 +1,7 @@
-import amazonBadge from "../../public/assets/generated/amazon-badge-transparent.webp";
-import certifiedSellerBadge from "../../public/assets/generated/certified-seller-badge-transparent.webp";
 import heroBannerImg from "../../public/assets/generated/hero-products.dim_1600x700.webp";
-import securePaymentBadge from "../../public/assets/generated/secure-payment-badge-transparent.webp";
+import amazonBadge from "../../public/assets/generated/generated/amazon-badge-transparent.png";
+import certifiedSellerBadge from "../../public/assets/generated/generated/certified-seller-badge-transparent.png";
+import securePaymentBadge from "../../public/assets/generated/generated/secure-payment-badge-transparent.png";
 
 interface HeroProps {
   navigate: (path: string) => void;
@@ -61,25 +61,23 @@ export default function Hero({ navigate }: HeroProps) {
               View Collections
             </button>
           </div>
-          {/* Trust Badges — white background panel so text is always readable */}
+          {/* Trust Badges */}
           <div className="flex flex-wrap justify-center sm:justify-start gap-3 sm:gap-4">
-            {[
-              { src: certifiedSellerBadge, alt: "Certified Seller" },
-              { src: amazonBadge, alt: "Available on Amazon" },
-              { src: securePaymentBadge, alt: "Secure Payment" },
-            ].map(({ src, alt }) => (
-              <div
-                key={alt}
-                className="bg-white rounded-lg px-3 py-2 flex items-center justify-center shadow-md"
-                style={{ minWidth: "96px", minHeight: "56px" }}
-              >
-                <img
-                  src={src}
-                  alt={alt}
-                  className="h-10 sm:h-12 w-auto object-contain"
-                />
-              </div>
-            ))}
+            <img
+              src={certifiedSellerBadge}
+              alt="Certified Seller"
+              className="h-10 sm:h-12 w-auto object-contain"
+            />
+            <img
+              src={amazonBadge}
+              alt="Available on Amazon"
+              className="h-10 sm:h-12 w-auto object-contain"
+            />
+            <img
+              src={securePaymentBadge}
+              alt="Secure Payment"
+              className="h-10 sm:h-12 w-auto object-contain"
+            />
           </div>
         </div>
       </div>
