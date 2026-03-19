@@ -136,7 +136,7 @@ interface AdminPageProps {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function AdminPage({ navigate }: AdminPageProps) {
-  const { actor, isFetching } = useActor();
+  const { actor, isFetching, isError: isActorError, refetchActor } = useActor();
   const [token, setToken] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
@@ -183,6 +183,23 @@ export default function AdminPage({ navigate }: AdminPageProps) {
     return (
       <div className="min-h-screen admin-bg flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-gold-500" />
+      </div>
+    );
+  }
+
+  if (isActorError) {
+    return (
+      <div className="min-h-screen admin-bg flex flex-col items-center justify-center gap-4">
+        <p className="text-admin-text font-semibold">
+          Connection failed. The server may be waking up.
+        </p>
+        <button
+          type="button"
+          onClick={() => void refetchActor()}
+          className="px-5 py-2 bg-gold-500 text-deep-blue rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
+        >
+          Retry Connection
+        </button>
       </div>
     );
   }

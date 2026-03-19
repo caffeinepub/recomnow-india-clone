@@ -12,5 +12,11 @@ export function useGetAllProducts() {
     },
     enabled: !!actor && !isFetching,
     staleTime: 30_000,
+    // Retry up to 4 times with exponential backoff to handle ICP canister cold-starts
+    retry: 4,
+    retryDelay: (attempt) => Math.min(2000 * 2 ** attempt, 20_000),
+    // Refetch in background after mount so stale data is refreshed
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }

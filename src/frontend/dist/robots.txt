@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 
 # Sitemap
-Sitemap: https://recomnowindia-2gi.caffeine.xyz/sitemap.xml
+Sitemap: https://recomnow-india-557.caffeine.xyz/sitemap.xml

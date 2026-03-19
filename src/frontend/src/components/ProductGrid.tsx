@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import type { Product } from "../backend.d";
+import { useActor } from "../hooks/useActor";
 import { useDebounce } from "../hooks/useDebounce";
 import { useGetAllProducts } from "../hooks/useQueries";
 import ProductCard from "./ProductCard";
 
-const PRODUCTS_PER_PAGE = 20;
+const PRODUCTS_PER_PAGE = 12;
 
 type SortOption = "default" | "price-asc" | "price-desc" | "discount";
 
@@ -56,7 +57,18 @@ function SkeletonCard() {
 }
 
 export default function ProductGrid() {
-  const { data: products = [], isLoading } = useGetAllProducts();
+  const {
+    isError: isActorError,
+    isFetching: isActorFetching,
+    refetchActor,
+  } = useActor();
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+    refetch,
+    isFetching,
+  } = useGetAllProducts();
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("default");
@@ -125,6 +137,10 @@ export default function ProductGrid() {
     setSearch(val);
     setPage(1);
   };
+
+  const showLoading =
+    isActorFetching || isLoading || (isFetching && products.length === 0);
+  const showError = isActorError || isError;
 
   return (
     <section className="py-12 bg-background" id="products">
@@ -229,49 +245,76 @@ export default function ProductGrid() {
           ))}
         </div>
 
-        {/* Product grid */}
-        {isLoading ? (
-          <div
-            data-ocid="products.grid.list"
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-          >
-            {SKELETON_KEYS.map((key) => (
-              <SkeletonCard key={key} />
-            ))}
-          </div>
-        ) : paginated.length === 0 ? (
-          <div data-ocid="products.grid.list" className="py-24 text-center">
-            <p className="text-4xl mb-4">🛍️</p>
+        {/* Error state with retry */}
+        {showError && (
+          <div data-ocid="products.error_state" className="py-16 text-center">
+            <p className="text-4xl mb-4">⚠️</p>
             <p className="text-lg font-semibold text-foreground mb-2">
-              No products found
+              Could not load products
             </p>
-            <p className="text-muted-foreground text-sm">
-              Try adjusting your search or filters.
+            <p className="text-muted-foreground text-sm mb-4">
+              The server may be waking up. Please try again.
             </p>
-          </div>
-        ) : (
-          <div
-            data-ocid="products.grid.list"
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
-          >
-            {paginated.map((product, idx) => (
-              <ProductCard
-                key={String(product.id)}
-                product={product}
-                index={(effectivePage - 1) * PRODUCTS_PER_PAGE + idx + 1}
-              />
-            ))}
+            <button
+              type="button"
+              onClick={() => {
+                void refetchActor();
+                void refetch();
+              }}
+              className="px-5 py-2 bg-pink-hot text-white rounded-xl text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              Retry
+            </button>
           </div>
         )}
 
-        {/* Pagination */}
-        {totalPages > 1 && (
+        {/* Product grid */}
+        {!showError &&
+          (showLoading ? (
+            <div
+              data-ocid="products.grid.list"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+            >
+              {SKELETON_KEYS.map((key) => (
+                <SkeletonCard key={key} />
+              ))}
+            </div>
+          ) : paginated.length === 0 ? (
+            <div
+              data-ocid="products.grid.empty_state"
+              className="py-24 text-center"
+            >
+              <p className="text-4xl mb-4">🛍️</p>
+              <p className="text-lg font-semibold text-foreground mb-2">
+                No products found
+              </p>
+              <p className="text-muted-foreground text-sm">
+                Try adjusting your search or filters.
+              </p>
+            </div>
+          ) : (
+            <div
+              data-ocid="products.grid.list"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+            >
+              {paginated.map((product, idx) => (
+                <ProductCard
+                  key={String(product.id)}
+                  product={product}
+                  index={(effectivePage - 1) * PRODUCTS_PER_PAGE + idx + 1}
+                />
+              ))}
+            </div>
+          ))}
+
+        {/* Pagination - always visible */}
+        {!showError && !showLoading && (
           <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
             <button
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={effectivePage === 1}
-              data-ocid="products.pagination_prev.button"
+              data-ocid="products.pagination_prev"
               className="px-4 py-2 border border-border rounded-xl text-sm font-medium text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               ← Previous
@@ -307,11 +350,22 @@ export default function ProductGrid() {
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={effectivePage === totalPages}
-              data-ocid="products.pagination_next.button"
+              data-ocid="products.pagination_next"
               className="px-4 py-2 border border-border rounded-xl text-sm font-medium text-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Next →
             </button>
+
+            <span className="w-full text-center text-sm text-muted-foreground mt-1">
+              Page{" "}
+              <span className="font-semibold text-foreground">
+                {effectivePage}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-foreground">
+                {totalPages}
+              </span>
+            </span>
           </div>
         )}
       </div>

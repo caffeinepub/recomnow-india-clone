@@ -29,6 +29,9 @@ export function useActor() {
     },
     // Only refetch when identity changes
     staleTime: Number.POSITIVE_INFINITY,
+    // Retry actor creation on canister cold-start failures
+    retry: 5,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 15_000),
     // This will cause the actor to be recreated when the identity changes
     enabled: true,
   });
@@ -51,6 +54,8 @@ export function useActor() {
 
   return {
     actor: actorQuery.data || null,
-    isFetching: actorQuery.isFetching,
+    isFetching: actorQuery.isFetching || actorQuery.isLoading,
+    isError: actorQuery.isError,
+    refetchActor: actorQuery.refetch,
   };
 }
